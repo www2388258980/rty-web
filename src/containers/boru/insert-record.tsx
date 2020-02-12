@@ -118,7 +118,7 @@ class InsertRecord extends React.Component<InsertRecordProps, InsertRecordStates
             ) : [];
         return (
             <div className="insert-record">
-                <div className="nav-tab">编辑</div>
+                <div className="nav">编辑</div>
                 <Form {...formItemLayout} onSubmit={this.handleSubmit}>
                     <Form.Item label="拨入人员" wrapperCol={{xs: {span: 2}, sm: {span: 3}}}>
                         {getFieldDecorator('firstName', {

@@ -46,6 +46,7 @@ const MyRouter = () => (
                         </Shenji>
                     }/>
                     <Route path="/test" component={CounterApp}/>
+                    <Route path="/" render={() => <Boru><InsertRecordApp/></Boru>}/>
                 </Switch>
             </App>
         }/>

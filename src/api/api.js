@@ -66,6 +66,7 @@ class _Api {
                     throw new Error("Bad response from server");
                 }
                 return response.json().then(function (json) {
+                    // callback();
                     return resolve(json);
                 })
 

@@ -3,16 +3,16 @@
  */
 export interface rtyDialRecord {
     vpnDialRecordId?: number;
-    firstName: string;
-    vpnDialCause: string;
-    description: string;
-    dialDate: string;
+    firstName?: string;
+    vpnDialCause?: string;
+    description?: string;
+    dialDate?: string;
     createdDate?: string;
     lastUpdatedStamp?: string;
     createdStamp?: string;
-    createdByUserLogin: string;
-    telecomNumber: string;
-    departmentId: number;
+    createdByUserLogin?: string;
+    telecomNumber?: string;
+    departmentId?: number;
 }
 
 export interface rtyDialPerson {
@@ -34,6 +34,11 @@ export interface rtyDialPerson {
 }
 
 export interface rtyDialPersonReq extends rtyDialPerson {
+    size: number;
+    pageSize: number;
+}
+
+export interface rtyDialRecordReq extends rtyDialRecord {
     size: number;
     pageSize: number;
 }
