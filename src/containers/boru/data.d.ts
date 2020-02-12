@@ -1,8 +1,6 @@
 /*
  * 定义rty_DialRecord pojo类
  */
-import {rtyDialOAPersonReq} from "../shenji/data";
-
 export interface rtyDialRecord {
     vpnDialRecordId?: number;
     firstName: string;
