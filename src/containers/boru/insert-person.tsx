@@ -260,6 +260,7 @@ const mapStateToProps = (state: any) => ({
     insertPersonLoading: state.boruReducer.insertPersonLoading,
     dataSourceResult: state.boruReducer.dataSourceResult,
     dataSourceLoading: state.boruReducer.dataSourceLoading,
+    total: state.boruReducer.total,
 })
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     getAllDepartment: bindActionCreators(getAllDepartment, dispatch),

@@ -17,12 +17,12 @@ export function insertPerson(rtyDialPerson: rtyDialPerson) {
 }
 
 
-export function getDialPerson(rtyDialPerson: rtyDialPersonReq) {
+export function getDialPerson(rtyDialPersonReq: rtyDialPersonReq) {
     let path = '/rtyDialPersons/getRtyDialPersons';
     return {
         type: 'dataSource',
         payload: {
-            promise: api.request(path, 'post', rtyDialPerson)
+            promise: api.request(path, 'post', rtyDialPersonReq)
         },
         resultType: 'data',
         isSpecial: true,

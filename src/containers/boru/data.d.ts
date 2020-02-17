@@ -17,18 +17,18 @@ export interface rtyDialRecord {
 
 export interface rtyDialPerson {
     dialPersonId?: number;
-    firstName: string;
-    telecomNumber: string;
-    description: string;
+    firstName?: string;
+    telecomNumber?: string;
+    description?: string;
     firstChar?: string;
-    departmentId: number;
-    status: string;
-    createdBy: string;
+    departmentId?: number;
+    status?: string;
+    createdBy?: string;
     modifiedBy?: string;
-    billId: string;
+    billId?: string;
     modifiedBillId?: string;
-    opType: string;
-    effectiveDate: string;
+    opType?: string;
+    effectiveDate?: string;
     lastUpdatedStamp?: string;
     createdStamp?: string;
 }

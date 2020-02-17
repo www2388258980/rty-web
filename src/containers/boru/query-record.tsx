@@ -8,7 +8,6 @@ import {PaginationConfig} from "antd/lib/pagination";
 
 import {rtyDialPerson, rtyDialRecord, rtyDialRecordReq} from "./data";
 import {getDialPersonByFirstChar, getDialRecord} from "./action";
-import {Link} from "react-router-dom";
 
 
 const FormItem = Form.Item;
@@ -27,6 +26,7 @@ export interface QueryRecordStates {
     exeSql: boolean;
     columns: any;
     pagination: PaginationConfig;
+    rtyDialRecord: rtyDialRecord; // 记录查询条件
 }
 
 class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
@@ -55,6 +55,7 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
         pagination: {
             pageSize: 5,
         },
+        rtyDialRecord: {}
     }
 
     componentDidMount(): void {
