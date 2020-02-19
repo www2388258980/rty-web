@@ -22,6 +22,38 @@ export interface rtyDialOAPerson {
     createdStamp?: string;
 }
 
+export interface rtyDialOAPersonHis {
+    historyId?: number;
+    dialPersonId?: number;
+    oldFirstName?:string;
+    oldTelecomNumber?:string;
+    oldCountName?:string;
+    oldStatus?:string;
+    oldDescription?:string;
+    oldFirstChar?:string;
+    oldDepartmentId?:string;
+    oldCreatedBy?:string;
+    oldModifiedBy?:string;
+    oldBillId?:string;
+    oldModifiedBillId?:string;
+    oldVpnTypeId?:string;
+    firstName?: string;
+    telecomNumber?: string;
+    countName?: string;
+    status?: string;
+    description?: string;
+    firstChar?: string;
+    departmentId?: number;
+    createdBy?: string;
+    modifiedBy?: string;
+    billId?: string;
+    modifiedBillId?: string;
+    vpnTypeId?: string;
+    opType?: string;
+    lastUpdatedStamp?: string;
+    createdStamp?: string;
+}
+
 export interface rtyObj {
     id: number;
     name: string;
@@ -38,4 +70,9 @@ export interface rtyDialOAPersonRes extends rtyDialOAPerson{
 export interface rtyDialOAPersonReq extends rtyDialOAPerson {
     size: number | undefined;
     pageSize: number | undefined;
+}
+
+export interface rtyDialOAPersonHisReq extends rtyDialOAPersonHis{
+    size: number;
+    pageSize: number;
 }

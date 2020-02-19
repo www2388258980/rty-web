@@ -17,6 +17,16 @@ export default function ShenjiReducer(state = {}, action: any) {
                     dataSourceLoading: false,
                     total: action.payload['total'],
                 });
+            case namespace + '_rtyOAPersonsHis_PENDING':
+                return Object.assign({}, state, {
+                    rtyOAPersonsHisLoading: true,
+                });
+            case namespace + '_rtyOAPersonsHis_SUCCESS':
+                return Object.assign({}, state, {
+                    rtyOAPersonsHisResult: action.payload[action.resultType],
+                    rtyOAPersonsHisLoading: false,
+                    rtyOAPersonsHisTotal: action.payload['total'],
+                });
             default:
                 return {...state};
         }

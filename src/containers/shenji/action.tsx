@@ -40,3 +40,16 @@ export function getRtyOADialPersonsByFirstChar(firstChar?: string) {
         namespace
     }
 }
+
+export function getOADialPersonsHis(data: rtyDialOAPersonReq, startDate?: string, endDate?: string) {
+    let path = '/rtyOADialPersons/getPersonsHisByCondition';
+    return {
+        type: 'rtyOAPersonsHis',
+        payload: {
+            promise: api.request(path, 'post', {...data, startDate, endDate})
+        },
+        resultType: 'data',
+        isSpecial: true,
+        namespace
+    }
+}
