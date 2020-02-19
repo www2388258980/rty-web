@@ -216,12 +216,12 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
                     <div>
                         <div className="nav">查询条件</div>
                         <Row>
-                            <Form onSubmit={this.handleSubmit}>
-                                <Col span={8}>
+                            <Form onSubmit={this.handleSubmit} style={{marginLeft: 20}}>
+                                <Col span={6}>
                                     <FormItem label="拨入人">
                                         {getFieldDecorator("firstName", {})(
                                             <Select placeholder="输入拨入人名字"
-                                                    style={{width: '40%'}}
+                                                    style={{width: '50%'}}
                                                     defaultActiveFirstOption={false}
                                                     showArrow={false}
                                                     filterOption={false}

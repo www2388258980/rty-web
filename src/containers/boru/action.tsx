@@ -1,5 +1,5 @@
 import api from '../../api/index';
-import {rtyDialPerson, rtyDialPersonReq, rtyDialRecord, rtyDialRecordReq} from "./data";
+import {rtyDialPerson, rtyDialPersonReq, rtyDialRecord, rtyDialRecordReq,rtyDialPersonHisReq} from "./data";
 
 const namespace = 'boru';
 
@@ -76,6 +76,20 @@ export function getDialRecord(rtyDialRecord: rtyDialRecordReq) {
         type: 'rtyDialRecord',
         payload: {
             promise: api.request(path, 'post', rtyDialRecord)
+        },
+        resultType: 'data',
+        isSpecial: true,
+        namespace
+    }
+
+}
+
+export function getDialPersonHis(rtyDialPersonHisReq: rtyDialPersonHisReq,startDate?: string,endDate?: string) {
+    let path = '/rtyDialPersons/getRtyDialPersonsHis';
+    return {
+        type: 'rtyDialPersonsHisSource',
+        payload: {
+            promise: api.request(path, 'post', {...rtyDialPersonHisReq,startDate,endDate})
         },
         resultType: 'data',
         isSpecial: true,

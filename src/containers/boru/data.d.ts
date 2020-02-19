@@ -33,12 +33,47 @@ export interface rtyDialPerson {
     createdStamp?: string;
 }
 
+export interface rtyDialPersonHis {
+    historyId?: number;
+    dialPersonId?: number;
+    oldFirstName?: string;
+    oldTelecomNumber?: string;
+    oldStatus?: string;
+    oldDescription?: string;
+    oldFirstChar?: string;
+    oldDepartmentId?: string;
+    oldDepartmentId?: string;
+    oldCreatedBy?: string;
+    oldModifiedBy?: string;
+    oldbillId?: string;
+    oldModifiedBillId?: string;
+    firstName?: string;
+    telecomNumber?: string;
+    description?: string;
+    firstChar?: string;
+    departmentId?: string;
+    status?: string;
+    createdBy?: string;
+    modifiedBy?: string;
+    billId?: string;
+    modifiedBillId?: string;
+    opType?: string;
+    effectiveDate?: string;
+    lastUpdatedStamp?: string;
+    createdStamp?: string;
+}
+
 export interface rtyDialPersonReq extends rtyDialPerson {
     size: number;
     pageSize: number;
 }
 
 export interface rtyDialRecordReq extends rtyDialRecord {
+    size: number;
+    pageSize: number;
+}
+
+export interface rtyDialPersonHisReq extends rtyDialPersonHis {
     size: number;
     pageSize: number;
 }
