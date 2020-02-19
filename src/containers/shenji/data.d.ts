@@ -5,19 +5,19 @@
 // 定义该pojo类的数据类型
 export interface rtyDialOAPerson {
     dialPersonId?: number;
-    firstName: string;
-    telecomNumber: string;
-    countName: string;
-    status: string;
-    description: string;
+    firstName?: string;
+    telecomNumber?: string;
+    countName?: string;
+    status?: string;
+    description?: string;
     firstChar?: string;
-    departmentId: number;
+    departmentId?: number;
     createdBy?: string;
     modifiedBy?: string;
     billId?: string;
     modifiedBillId?: string;
     vpnTypeId?: string;
-    opType: string;
+    opType?: string;
     lastUpdatedStamp?: string;
     createdStamp?: string;
 }
