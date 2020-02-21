@@ -7,7 +7,7 @@ import {FormComponentProps} from "antd/lib/form";
 import {StatusConstants} from "../../constants/commonConstants";
 import {bindActionCreators, Dispatch} from "redux";
 import {PaginationConfig} from "antd/lib/pagination";
-import {rtyDialOAPerson, rtyDialOAPersonHisReq, rtyDialOAPersonRes} from "./data";
+import {rtyDialOAPerson, rtyDialOAPersonHisReq, rtyDialOAPersonExtend, rtyDialOAPersonHisExtend} from "./data";
 import {getAllDepartment} from "../action";
 import {getRtyOADialPersonsByFirstChar, getOADialPersonsHis} from "./action";
 import {rtyDialPersonHis} from "../boru/data";
@@ -21,7 +21,7 @@ export interface queryOAHisProps extends FormComponentProps {
     getRtyOADialPersonsByFirstChar: any;
     rtyOADialPersonsByFirstCharSourceResult: rtyDialOAPerson[];
     getOADialPersonsHis: any;
-    rtyOAPersonsHisResult: rtyDialPersonHis[];
+    rtyOAPersonsHisResult: rtyDialOAPersonHisExtend[];
     rtyOAPersonsHisLoading: boolean;
     rtyOAPersonsHisTotal: number;
 }
@@ -41,18 +41,24 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
     state = {
         columns: [
             {
+                title: '操作类型',
+                dataIndex: 'opType',
+                width: 100
+            },
+
+            {
                 title: '状态',
                 dataIndex: 'status',
                 width: 80
             },
             {
-                title: '账号名',
-                dataIndex: 'countName',
+                title: 'rtyOA账号类型',
+                dataIndex: 'vpnType.description',
                 width: 150
             },
             {
-                title: '账号类型',
-                dataIndex: 'vpnType.description',
+                title: '账号名',
+                dataIndex: 'countName',
                 width: 180
             },
             {
@@ -80,49 +86,19 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
                 width: 150
             },
             {
-                title: '修改工单',
-                dataIndex: 'modifiedBillId',
-                width: 150
-            },
-            {
-                title: '创建人',
-                dataIndex: 'createdBy',
-                width: 80
-            },
-            {
                 title: '修改人',
-                dataIndex: 'modifiedBy',
+                dataIndex: 'modifiedByUser.name',
                 width: 80
             },
             {
-                title: '创建时间',
+                title: '操作时间',
                 dataIndex: 'createdStamp',
-                width: 200
+                width: 200,
+                fixed: 'right' as 'right',
             },
-            {
-                title: '修改时间',
-                dataIndex: 'lastUpdatedStamp',
-                width: 200
-            },
-            {
-                title: 'Action',
-                key: 'editor',
-                width: 80,
-                render: (text: rtyDialOAPersonRes) => {
-                    return (<div className="editor" data-id={text.dialPersonId}>编辑</div>);
-                },
-            },
-            {
-                title: 'Action',
-                key: 'stop',
-                width: 80,
-                render: (text: rtyDialOAPersonRes) => {
-                    return (<div className="stop" data-id={text.dialPersonId}>停用</div>);
-                },
-            }
         ],
         pagination: {
-            pageSize: 5,
+            pageSize: 10,
         },
         exeSql: false,
         rtyOADialPersonHis: {},
@@ -154,7 +130,7 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
 
     }
 
-    handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 5}) => {
+    handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 10}) => {
         const pager: PaginationConfig = {...this.state.pagination};
         pager.current = pagination.current;
         pager.pageSize = pagination.pageSize;
@@ -195,9 +171,11 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
                     departmentId: formData.department,
                     status: formData.status,
                     size: 1,
-                    pageSize: 5,
+                    pageSize: 10,
                 };
-                getOADialPersonsHis(rtyDialOAPersonHisReq, formData.startDate, formData.endDate);
+                // 小于等于
+                const startDate = formData.startDate ? formData.startDate - 24 * 60 * 60 * 1000 : '';
+                getOADialPersonsHis(rtyDialOAPersonHisReq, startDate, formData.endDate);
                 this.setState({
                     exeSql: true,
                     rtyOADialPersonHis: {
@@ -205,7 +183,7 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
                         departmentId: formData.department,
                         status: formData.status,
                     },
-                    startDate: formData.startDate,
+                    startDate: String(startDate),
                     endDate: formData.endDate
                 })
             }
@@ -223,7 +201,7 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
 
         const rtyOADialPersons = rtyOADialPersonsByFirstCharSourceResult ?
             rtyOADialPersonsByFirstCharSourceResult.map((item: rtyDialOAPerson) =>
-                <Option key={item.dialPersonId} value={item.dialPersonId}>{item.firstName}</Option>,
+                <Option key={item.dialPersonId} value={item.firstName}>{item.firstName}</Option>,
             ) : [];
 
         const {exeSql} = this.state;
@@ -302,7 +280,7 @@ class QueryOAHis extends React.Component<queryOAHisProps, queryOAHisStates> {
                                columns={this.state.columns}
                                dataSource={rtyOAPersonsHisResult}
                                loading={rtyOAPersonsHisLoading}
-                               pagination={this.state.pagination} scroll={{x: 2200}}
+                               pagination={this.state.pagination} scroll={{x: 1800}}
                                onChange={this.handleTableChange}/>
                     </div>}
 

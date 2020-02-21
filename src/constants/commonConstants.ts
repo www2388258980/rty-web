@@ -1,10 +1,10 @@
-interface VpnType {
+interface RtyType {
     VPN_TYPE_00: string;
     VPN_TYPE_01: string;
     VPN_TYPE_02: string;
 }
 
-export const VpnConstants: VpnType = {
+export const RtyConstants: RtyType = {
     VPN_TYPE_00: 'VPN_TYPE_00',
     VPN_TYPE_01: 'VPN_TYPE_01',
     VPN_TYPE_02: 'VPN_TYPE_02'

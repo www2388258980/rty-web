@@ -111,7 +111,7 @@ class Editor extends React.Component<editorAppInstProps, editorAppInstStates> {
             <Option value={item.id} key={item.id}>{item.name}</Option>) : [];
 
         return (
-            <Modal className="editor-inst"
+            <Modal className="编辑"
                    visible={visible}
                    centered={true}
                    width={800}

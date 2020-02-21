@@ -3,6 +3,8 @@
  */
 
 // 定义该pojo类的数据类型
+import {department, rtyOAType, user} from "../data";
+
 export interface rtyDialOAPerson {
     dialPersonId?: number;
     firstName?: string;
@@ -25,18 +27,18 @@ export interface rtyDialOAPerson {
 export interface rtyDialOAPersonHis {
     historyId?: number;
     dialPersonId?: number;
-    oldFirstName?:string;
-    oldTelecomNumber?:string;
-    oldCountName?:string;
-    oldStatus?:string;
-    oldDescription?:string;
-    oldFirstChar?:string;
-    oldDepartmentId?:string;
-    oldCreatedBy?:string;
-    oldModifiedBy?:string;
-    oldBillId?:string;
-    oldModifiedBillId?:string;
-    oldVpnTypeId?:string;
+    oldFirstName?: string;
+    oldTelecomNumber?: string;
+    oldCountName?: string;
+    oldStatus?: string;
+    oldDescription?: string;
+    oldFirstChar?: string;
+    oldDepartmentId?: string;
+    oldCreatedBy?: string;
+    oldModifiedBy?: string;
+    oldBillId?: string;
+    oldModifiedBillId?: string;
+    oldVpnTypeId?: string;
     firstName?: string;
     telecomNumber?: string;
     countName?: string;
@@ -54,25 +56,27 @@ export interface rtyDialOAPersonHis {
     createdStamp?: string;
 }
 
-export interface rtyObj {
-    id: number;
-    name: string;
+export interface rtyDialOAPersonExtend extends rtyDialOAPerson {
+    department?: department;
+    createdByUser?: user;
+    modifiedByUser?: user;
+    vpnType?: rtyOAType;
 }
 
-// 定义getPersonsByCondition接口返回数据类型以及请求该接口数据类型
-export interface rtyDialOAPersonRes extends rtyDialOAPerson{
-    department: rtyObj;
-    createdByUser: rtyObj;
-    modifiedByUser: rtyObj;
-    vpnType: { enumId: string; description: string }
+export interface rtyDialOAPersonHisExtend extends rtyDialOAPersonHis {
+    department?: department;
+    createdByUser?: user;
+    modifiedByUser?: user;
+    vpnType?: rtyOAType;
 }
+
 
 export interface rtyDialOAPersonReq extends rtyDialOAPerson {
     size: number | undefined;
     pageSize: number | undefined;
 }
 
-export interface rtyDialOAPersonHisReq extends rtyDialOAPersonHis{
+export interface rtyDialOAPersonHisReq extends rtyDialOAPersonHis {
     size: number;
     pageSize: number;
 }

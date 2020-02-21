@@ -8,13 +8,14 @@ import {PaginationConfig} from "antd/lib/pagination";
 
 
 import {getPersonsByCondition, insertRtyDialOAPersons} from './action';
-import {rtyDialOAPersonRes, rtyDialOAPerson} from './data';
+import {rtyDialOAPerson, rtyDialOAPersonExtend} from './data';
 
-import {VpnConstants, StatusConstants} from '../../constants/commonConstants';
+import {RtyConstants, StatusConstants} from '../../constants/commonConstants';
 import {getAllDepartment} from "../action";
 
 
 import "./index.less";
+import EditorOAFormApp from "./eidtor-oa";
 
 const style = {
     'insertOA': 'insert-OA',
@@ -29,7 +30,7 @@ export interface InsertOAProps extends FormComponentProps {
     getAllDepartment: any;
     insertRtyDialOAPersons: any;
 
-    dataSourceResult: Array<rtyDialOAPersonRes>;
+    dataSourceResult: Array<rtyDialOAPersonExtend>;
     total: number;  // 数据长度
     dataSourceLoading: boolean;
     insertLoading: boolean;
@@ -39,6 +40,8 @@ export interface InsertOAProps extends FormComponentProps {
 export interface InsertOAStates {
     columns: any;
     pagination: PaginationConfig;
+    visible: boolean;
+    rtyOADialPerson: rtyDialOAPersonExtend; // 记录编辑
 }
 
 
@@ -88,16 +91,16 @@ class InsertOA extends React.Component<InsertOAProps, InsertOAStates> {
             {
                 title: '修改工单',
                 dataIndex: 'modifiedBillId',
-                width: 150
+                width: 200
             },
             {
                 title: '创建人',
-                dataIndex: 'createdBy',
+                dataIndex: 'createdByUser.name',
                 width: 80
             },
             {
                 title: '修改人',
-                dataIndex: 'modifiedBy',
+                dataIndex: 'modifiedByUser.name',
                 width: 80
             },
             {
@@ -114,22 +117,18 @@ class InsertOA extends React.Component<InsertOAProps, InsertOAStates> {
                 title: 'Action',
                 key: 'editor',
                 width: 80,
-                render: (text: rtyDialOAPersonRes) => {
-                    return (<div className="editor" data-id={text.dialPersonId}>编辑</div>);
+                fixed: 'right' as 'right',
+                render: (text: rtyDialOAPersonExtend) => {
+                    return (<div className="action" onClick={this.editor.bind(this, text)}>编辑</div>);
                 },
             },
-            {
-                title: 'Action',
-                key: 'stop',
-                width: 80,
-                render: (text: rtyDialOAPersonRes) => {
-                    return (<div className="stop" data-id={text.dialPersonId}>停用</div>);
-                },
-            }
         ],
         pagination: {
             pageSize: 5,
         },
+        visible: false,
+        rtyOADialPerson: {},
+
     }
 
     componentDidMount() {
@@ -158,12 +157,6 @@ class InsertOA extends React.Component<InsertOAProps, InsertOAStates> {
         }
 
     }
-
-
-    componentWillReceiveProps(nextProps: Readonly<InsertOAProps>, nextContext: any): void {
-
-    }
-
 
     handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 5}) => {
         const pager: PaginationConfig = {...this.state.pagination};
@@ -201,6 +194,19 @@ class InsertOA extends React.Component<InsertOAProps, InsertOAStates> {
                 insertRtyDialOAPersons(rtyDialOAPerson);
             }
         });
+    }
+
+    editor(rtyOADialPerson: rtyDialOAPersonExtend) {
+        this.setState({
+            visible: true,
+            rtyOADialPerson: rtyOADialPerson,
+        })
+    }
+
+    setVisible = (visible: boolean) => {
+        this.setState({
+            visible,
+        })
     }
 
     render() {
@@ -263,9 +269,9 @@ class InsertOA extends React.Component<InsertOAProps, InsertOAStates> {
                             <FormItem label="vpn账号类型">
                                 {getFieldDecorator('vpnType', {rules: [{required: true, message: '请选择vpn账号类型'}]})(
                                     <Select placeholder="请选择vpn账号类型" style={{width: '100%', height: 30}}>
-                                        <Option value={VpnConstants.VPN_TYPE_00}>公网-BOSS接入层</Option>
-                                        <Option value={VpnConstants.VPN_TYPE_01}>公网-BOSS访问层</Option>
-                                        <Option value={VpnConstants.VPN_TYPE_02}>OA-BOSS接入层</Option>
+                                        <Option value={RtyConstants.VPN_TYPE_00}>公网-BOSS接入层</Option>
+                                        <Option value={RtyConstants.VPN_TYPE_01}>公网-BOSS访问层</Option>
+                                        <Option value={RtyConstants.VPN_TYPE_02}>OA-BOSS接入层</Option>
                                     </Select>
                                 )}
                             </FormItem>
@@ -290,14 +296,19 @@ class InsertOA extends React.Component<InsertOAProps, InsertOAStates> {
                     </Row>
                 </Form>
                 {/*分页展示*/}
-                <div className="nav-list">拨入人员列表</div>
+                <div className="nav">人员列表</div>
                 <div className="page-nick">
                     <Table bordered
                            columns={this.state.columns} dataSource={dataSourceResult}
                            pagination={this.state.pagination} scroll={{x: 2200}} loading={dataSourceLoading}
                            onChange={this.handleTableChange}/>
                 </div>
-
+                {this.state.visible &&
+                // @ts-ignore
+                <EditorOAFormApp visible={this.state.visible}
+                                 setVisible={this.setVisible}
+                                 rtyOADialPerson={this.state.rtyOADialPerson}
+                                 handleTableChange={this.handleTableChange}/>}
             </div>
         );
     }

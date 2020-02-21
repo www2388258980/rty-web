@@ -53,3 +53,15 @@ export function getOADialPersonsHis(data: rtyDialOAPersonReq, startDate?: string
         namespace
     }
 }
+
+export function updateRtyOADialPersons(data: rtyDialOAPersonReq) {
+    let path = '/rtyOADialPersons/update';
+    return {
+        type: 'updateRtyOADialPersons',
+        payload: {
+            promise: api.request(path, 'post', {...data})
+        },
+        resultType: 'data',
+        namespace
+    }
+}

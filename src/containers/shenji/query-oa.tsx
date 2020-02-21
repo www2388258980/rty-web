@@ -7,8 +7,9 @@ import {FormComponentProps} from "antd/lib/form";
 import {bindActionCreators, Dispatch} from "redux";
 import {getAllDepartment} from "../action";
 import {getRtyOADialPersonsByFirstChar, getPersonsByCondition} from './action';
-import {rtyDialOAPerson, rtyDialOAPersonReq, rtyDialOAPersonRes} from "./data";
+import {rtyDialOAPerson, rtyDialOAPersonReq, rtyDialOAPersonExtend} from "./data";
 import {PaginationConfig} from "antd/lib/pagination";
+import EditorOAFormApp from "./eidtor-oa";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -19,7 +20,7 @@ export interface queryOAProps extends FormComponentProps {
     getRtyOADialPersonsByFirstChar: any;
     rtyOADialPersonsByFirstCharSourceResult: rtyDialOAPerson[];
     getPersonsByCondition: any;
-    dataSourceResult: Array<rtyDialOAPersonRes>;
+    dataSourceResult: Array<rtyDialOAPersonExtend>;
     total: number;  // 数据长度
     dataSourceLoading: boolean;
 }
@@ -28,7 +29,9 @@ export interface queryOAStates {
     columns: any;
     pagination: PaginationConfig;
     exeSql: boolean;
-    rtyOADialPerson: rtyDialOAPerson; // 记录查询条件
+    rtyOADialPerson: rtyDialOAPersonExtend; // 记录查询条件
+    visible: boolean;
+    rtyOADialPersonnu: rtyDialOAPersonExtend; // 记录编辑
 }
 
 class QueryOA extends React.Component<queryOAProps, queryOAStates> {
@@ -69,32 +72,17 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
                 dataIndex: 'description',
             },
             {
-                title: '工单',
-                dataIndex: 'billId',
-                width: 150
-            },
-            {
-                title: '修改工单',
+                title: '最后启用的工单',
                 dataIndex: 'modifiedBillId',
                 width: 150
             },
             {
-                title: '创建人',
-                dataIndex: 'createdBy',
-                width: 80
+                title: '最后启用人',
+                dataIndex: 'modifiedByUser.name',
+                width: 120
             },
             {
-                title: '修改人',
-                dataIndex: 'modifiedBy',
-                width: 80
-            },
-            {
-                title: '创建时间',
-                dataIndex: 'createdStamp',
-                width: 200
-            },
-            {
-                title: '修改时间',
+                title: '最后启用时间',
                 dataIndex: 'lastUpdatedStamp',
                 width: 200
             },
@@ -102,24 +90,19 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
                 title: 'Action',
                 key: 'editor',
                 width: 80,
-                render: (text: rtyDialOAPersonRes) => {
-                    return (<div className="editor" data-id={text.dialPersonId}>编辑</div>);
+                fixed: 'right' as 'right',
+                render: (text: rtyDialOAPersonExtend) => {
+                    return (<div className="action" onClick={this.editor.bind(this, text)}>编辑</div>);
                 },
             },
-            {
-                title: 'Action',
-                key: 'stop',
-                width: 80,
-                render: (text: rtyDialOAPersonRes) => {
-                    return (<div className="stop" data-id={text.dialPersonId}>停用</div>);
-                },
-            }
         ],
         pagination: {
-            pageSize: 5,
+            pageSize: 10,
         },
         exeSql: false,
-        rtyOADialPerson: {}
+        rtyOADialPerson: {},
+        visible: false,
+        rtyOADialPersonnu: {},
     }
 
     componentDidMount(): void {
@@ -152,7 +135,7 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
                     firstName: formData.firstName,
                     departmentId: formData.department,
                     size: 1,
-                    pageSize: 5,
+                    pageSize: 10,
                 }
                 getPersonsByCondition(rtyDialOAPersonReq);
                 this.setState({
@@ -178,7 +161,7 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
         })
     }
 
-    handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 5}) => {
+    handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 10}) => {
         const pager: PaginationConfig = {...this.state.pagination};
         pager.current = pagination.current;
         pager.pageSize = pagination.pageSize;
@@ -191,11 +174,24 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
             // @ts-ignore
             firstName: rtyOADialPerson.firstName,
             // @ts-ignore
-            departmentId: rtyOADialPerson.department,
+            departmentId: rtyOADialPerson.department && rtyOADialPerson.department.id,
             size: pager.current,
             pageSize: pager.pageSize
         };
         getPersonsByCondition(data);
+    }
+
+    editor(rtyOADialPerson: rtyDialOAPersonExtend) {
+        this.setState({
+            visible: true,
+            rtyOADialPersonnu: rtyOADialPerson,
+        })
+    }
+
+    setVisible = (visible: boolean) => {
+        this.setState({
+            visible,
+        })
     }
 
     render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> |
@@ -209,7 +205,7 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
 
         const rtyOADialPersons = rtyOADialPersonsByFirstCharSourceResult ?
             rtyOADialPersonsByFirstCharSourceResult.map((item: rtyDialOAPerson) =>
-                <Option key={item.dialPersonId} value={item.dialPersonId}>{item.firstName}</Option>,
+                <Option key={item.dialPersonId} value={item.firstName}>{item.firstName}</Option>,
             ) : [];
 
         return (
@@ -258,13 +254,17 @@ class QueryOA extends React.Component<queryOAProps, queryOAStates> {
                         <div className="nav" onClick={this.goBack} style={{cursor: 'pointer'}}>返回</div>
                         <Table bordered
                                columns={this.state.columns} dataSource={dataSourceResult} loading={dataSourceLoading}
-                               pagination={this.state.pagination} scroll={{x: 2200}}
+                               pagination={this.state.pagination} scroll={{x: 1800}}
                                onChange={this.handleTableChange}/>
 
                     </div>
-
                 }
-
+                {this.state.visible &&
+                // @ts-ignore
+                <EditorOAFormApp visible={this.state.visible}
+                                 setVisible={this.setVisible}
+                                 rtyOADialPerson={this.state.rtyOADialPersonnu}
+                                 handleTableChange={this.handleTableChange}/>}
 
             </div>
         );

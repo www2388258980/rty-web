@@ -169,9 +169,9 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
             //@ts-ignore
             firstName: rtyDialPersonHis.firstName,
             //@ts-ignore
-            departmentId: rtyDialPersonHis.department,
+            departmentId: rtyDialPersonHis.department && rtyDialPersonHis.department.id,
             //@ts-ignore
-            status: formData.status,
+            status: rtyDialPersonHis.status,
             size: Number(pagination.current),
             pageSize: Number(pagination.pageSize),
         }
