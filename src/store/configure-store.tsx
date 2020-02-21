@@ -6,12 +6,14 @@ import CounterReducer from './reducers/test';
 import ShenjiReducer from './reducers/shenji';
 import CommonReducer from './reducers/commonReducers';
 import BoruReducer from './reducers/boruReducers'
+import LoginReducer from "./reducers/loginReducers";
 
 const reducer = combineReducers({
     counterReducer: CounterReducer,
     shenjiReducer: ShenjiReducer,
     commonReducer: CommonReducer,
     boruReducer: BoruReducer,
+    loginReducer: LoginReducer,
 })
 
 

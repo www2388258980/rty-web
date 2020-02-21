@@ -84,7 +84,7 @@ class App extends React.Component<AppProps, AppState> {
         const TestIcon = (props: any) => <Icon component={testSVg} {...props} />;
 
         return (
-            <div className="app">
+            <div className="app" >
                 <Layout>
                     <Sider className="slider" collapsible collapsed={this.state.collapsed} trigger={null} width={250}>
                         <div className="logo"
@@ -102,7 +102,7 @@ class App extends React.Component<AppProps, AppState> {
                             mode="inline"
                             defaultSelectedKeys={['1']}
                             defaultOpenKeys={['审计']}
-                            style={{height: 950, borderRight: 0}}
+                            style={{borderRight: 0,height: 950}}
                             openKeys={this.state.openKeys}
                             onOpenChange={this.onOpenChange}
                         >
