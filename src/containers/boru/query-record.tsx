@@ -2,16 +2,17 @@ import React, {FormEvent} from 'react';
 import {bindActionCreators, Dispatch} from "redux";
 import {connect} from 'react-redux';
 
-import {Form, DatePicker, Select, Row, Col, Button, Table} from "antd";
+import {Form, DatePicker, Select, Row, Col, Button, Table, Modal, message} from "antd";
 import {FormComponentProps} from "antd/lib/form";
 import {PaginationConfig} from "antd/lib/pagination";
 
 import {rtyDialPerson, rtyDialRecord, rtyDialRecordReq} from "./data";
-import {getDialPersonByFirstChar, getDialRecord} from "./action";
+import {getDialPersonByFirstChar, getDialRecord, deleteDialRecord} from "./action";
 
 
 const FormItem = Form.Item;
 const {Option} = Select;
+const {confirm} = Modal;
 
 export interface QueryRecordProps extends FormComponentProps {
     getDialPersonByFirstChar: any;
@@ -20,6 +21,8 @@ export interface QueryRecordProps extends FormComponentProps {
     rtyDialRecordResult: Array<rtyDialRecord>;
     rtyDialRecordLoading: boolean;
     rtyDialRecordTotal: number;
+    deleteDialRecord: any;
+    deleteDialRecordLoading: string;
 }
 
 export interface QueryRecordStates {
@@ -27,6 +30,8 @@ export interface QueryRecordStates {
     columns: any;
     pagination: PaginationConfig;
     rtyDialRecord: rtyDialRecord; // 记录查询条件
+    startDate: string;
+    endDate: string;
 }
 
 class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
@@ -44,18 +49,22 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
             {
                 title: 'Action',
                 key: 'delete',
+                dataIndex: '',
                 fixed: 'right' as 'right',
                 width: 100,
                 render: (text: rtyDialRecord) => {
-                    return <div className="delete" data-id={text.vpnDialRecordId}>删除</div>
+                    return <div className="delete action" data-id={text.vpnDialRecordId}
+                                onClick={this.hanldleDelete.bind(this, String(text.vpnDialRecordId))}>删除</div>
                 }
             }
 
         ],
         pagination: {
-            pageSize: 5,
+            pageSize: 10,
         },
-        rtyDialRecord: {}
+        rtyDialRecord: {},
+        startDate: '',
+        endDate: '',
     }
 
     componentDidMount(): void {
@@ -64,15 +73,28 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
     }
 
     componentDidUpdate(prevProps: Readonly<QueryRecordProps>, prevState: Readonly<QueryRecordStates>, snapshot?: any): void {
-        const {rtyDialRecordLoading} = prevProps;
+        const {rtyDialRecordLoading, deleteDialRecordLoading} = prevProps;
         if (rtyDialRecordLoading && rtyDialRecordLoading != this.props.rtyDialRecordLoading) {
             // 当获取数据成功以后设置total
             const pager: PaginationConfig = {...this.state.pagination};
             pager.total = this.props.rtyDialRecordTotal;
-            console.log("total: " + this.props.rtyDialRecordTotal);
             this.setState({
                 pagination: pager,
             })
+        }
+        if (deleteDialRecordLoading && deleteDialRecordLoading != this.props.deleteDialRecordLoading) {
+            message.success("删除记录成功!");
+            // 根据条件刷新页面
+            const pager: PaginationConfig = {...this.state.pagination};
+            const {getDialRecord} = this.props;
+            const {rtyDialRecord, startDate, endDate} = this.state;
+            const rtyDialRecordReq: rtyDialRecordReq = {
+                // @ts-ignore
+                firstName: rtyDialRecord.firstName,
+                size: Number(pager.current),
+                pageSize: Number(pager.pageSize),
+            }
+            getDialRecord(rtyDialRecordReq, startDate, endDate);
         }
     }
 
@@ -95,11 +117,18 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
                 const rtyDialRecordReq: rtyDialRecordReq = {
                     firstName: formData.firstName,
                     size: 1,
-                    pageSize: 5,
+                    pageSize: 10,
                 }
-                getDialRecord(rtyDialRecordReq);
+                // 小于等于
+                const startDate = formData.startDate ? formData.startDate - 24 * 60 * 60 * 1000 : '';
+                getDialRecord(rtyDialRecordReq, startDate, formData.endDate);
                 this.setState({
-                    exeSql: true
+                    exeSql: true,
+                    rtyDialRecord: {
+                        firstName: formData.firstName,
+                    },
+                    startDate: String(startDate),
+                    endDate: formData.endDate,
                 })
             }
         }));
@@ -112,9 +141,11 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
         this.setState({
             pagination: pager,
         });
-        const data = {size: pager.current, pageSize: pager.pageSize};
+        const {rtyDialRecord, startDate, endDate} = this.state;
+        // @ts-ignore
+        const data = {firstName: rtyDialRecord.firstName, size: pager.current, pageSize: pager.pageSize};
         const {getDialRecord} = this.props;
-        getDialRecord(data);
+        getDialRecord(data, startDate, endDate);
     }
 
     goBack = () => {
@@ -122,6 +153,19 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
             exeSql: false
         })
     }
+
+    hanldleDelete(id: string) {
+        const {deleteDialRecord} = this.props;
+        confirm({
+            content: <div>确定删除该条记录?</div>,
+            onOk() {
+                deleteDialRecord(id);
+            },
+            onCancel() {
+            },
+        });
+    }
+
 
     render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> |
         string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
@@ -186,7 +230,6 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
 
                     </div>}
 
-
             </div>
         );
     }
@@ -199,11 +242,13 @@ const mapStateTopProps = (state: any) => ({
     rtyDialRecordLoading: state.boruReducer.rtyDialRecordLoading,
     rtyDialRecordResult: state.boruReducer.rtyDialRecordResult,
     rtyDialRecordTotal: state.boruReducer.rtyDialRecordTotal,
+    deleteDialRecordLoading: state.boruReducer.deleteDialRecordLoading,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     getDialPersonByFirstChar: bindActionCreators(getDialPersonByFirstChar, dispatch),
     getDialRecord: bindActionCreators(getDialRecord, dispatch),
+    deleteDialRecord: bindActionCreators(deleteDialRecord, dispatch),
 })
 
 const QueryRecordApp = connect(

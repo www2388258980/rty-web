@@ -1,6 +1,8 @@
 /*
  * 定义rty_DialRecord pojo类
  */
+import {department, user} from "../data";
+
 export interface rtyDialRecord {
     vpnDialRecordId?: number;
     firstName?: string;
@@ -61,6 +63,18 @@ export interface rtyDialPersonHis {
     effectiveDate?: string;
     lastUpdatedStamp?: string;
     createdStamp?: string;
+}
+
+export interface rtyDialPersonExtend extends rtyDialPerson {
+    department?: department;
+    createdUser?: user;
+    modifiedUser?: user;
+}
+
+export interface rtyDialPersonHisExtend extends rtyDialPersonHis {
+    department?: department;
+    createdUser?: user;
+    modifiedUser?: user;
 }
 
 export interface rtyDialPersonReq extends rtyDialPerson {

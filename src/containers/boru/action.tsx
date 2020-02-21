@@ -70,12 +70,12 @@ export function insertDialRecord(rtyDialRecord: rtyDialRecord) {
 
 }
 
-export function getDialRecord(rtyDialRecord: rtyDialRecordReq) {
+export function getDialRecord(rtyDialRecord: rtyDialRecordReq,startDate?: string,endDate?: string) {
     let path = '/rtyDialRecord/getRecords';
     return {
         type: 'rtyDialRecord',
         payload: {
-            promise: api.request(path, 'post', rtyDialRecord)
+            promise: api.request(path, 'post', {...rtyDialRecord,startDate,endDate})
         },
         resultType: 'data',
         isSpecial: true,
@@ -93,6 +93,31 @@ export function getDialPersonHis(rtyDialPersonHisReq: rtyDialPersonHisReq,startD
         },
         resultType: 'data',
         isSpecial: true,
+        namespace
+    }
+
+}
+
+export function deleteDialRecord(id: string) {
+    let path = '/rtyDialRecord/deleteDialRecord';
+    return {
+        type: 'deleteDialRecord',
+        payload: {
+            promise: api.request(path, 'post', {id})
+        },
+        resultType: 'message',
+        namespace
+    }
+}
+
+export function updateRtyDialPerson(rtyDialPerson: rtyDialPerson) {
+    let path = '/rtyDialPersons/updateRtyDialPersons';
+    return {
+        type: 'updateRtyDialPerson',
+        payload: {
+            promise: api.request(path, 'post', {...rtyDialPerson})
+        },
+        resultType: 'data',
         namespace
     }
 

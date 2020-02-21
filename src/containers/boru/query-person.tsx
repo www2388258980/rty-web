@@ -5,10 +5,11 @@ import {connect} from 'react-redux';
 import {Form, Select, Row, Col, Button, Table} from 'antd';
 import {FormComponentProps} from "antd/lib/form";
 import {bindActionCreators, Dispatch} from "redux";
-import {rtyDialPerson, rtyDialPersonReq} from "./data";
+import {rtyDialPerson, rtyDialPersonExtend, rtyDialPersonReq} from "./data";
 import {getDialPerson, getDialPersonByFirstChar} from "./action";
 import {getAllDepartment} from "../action";
 import {PaginationConfig} from "antd/lib/pagination";
+import EditorFormApp from "./editor-inst";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -19,7 +20,7 @@ export interface queryPersonsProps extends FormComponentProps {
     getAllDepartment: any;
     departmentResult: Array<{ id: number, name: string }>; // 部门
     getDialPerson: any;
-    dataSourceResult: Array<rtyDialPerson>;
+    dataSourceResult: Array<rtyDialPersonExtend>;
     dataSourceLoading: boolean;
     total: number;
 }
@@ -28,7 +29,9 @@ export interface queryPersonsStates {
     columns: any;
     pagination: PaginationConfig;
     exeSql: boolean;
-    rtyDialPerson: rtyDialPerson; // 记录查询条件
+    rtyDialPerson: rtyDialPersonExtend; // 记录查询条件
+    visible: boolean;
+    rtyDialPersonnu: rtyDialPersonExtend; // 记录编辑
 }
 
 class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates> {
@@ -37,74 +40,53 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
             {
                 title: '状态',
                 dataIndex: 'status',
+                fixed: 'left' as 'left',
                 width: 80,
             },
             {
                 title: '名字',
                 dataIndex: 'firstName',
+                fixed: 'left' as 'left',
                 width: 120,
             },
             {
                 title: '电话号码',
                 dataIndex: 'telecomNumber',
+                fixed: 'left' as 'left',
                 width: 150,
+            },
+            {
+                title: '部门',
+                dataIndex: 'department.name',
+                width: 200,
             },
             {
                 title: '描述',
                 dataIndex: 'description',
             },
             {
-                title: '部门',
-                dataIndex: 'firstName',
-                width: 200,
-            },
-            {
-                title: '创建工单',
-                dataIndex: 'billId',
-                width: 150,
-            },
-            {
-                title: '修改工单',
+                title: '最后启用的工单',
                 dataIndex: 'modifiedBillId',
                 width: 150,
             },
             {
-                title: '创建人',
-                dataIndex: 'createdBy',
+                title: '最后启用人',
+                dataIndex: 'modifiedUser.name',
                 width: 120,
             },
             {
-                title: '修改人',
-                dataIndex: 'modifiedBy',
-                width: 120,
-            },
-            {
-                title: '创建时间',
-                dataIndex: 'createdStamp',
+                title: '最后启用时间',
+                dataIndex: 'lastUpdatedStamp',
                 width: 200,
-            },
-            {
-                title: '有限期限',
-                dataIndex: 'effectiveDate',
-                width: 200,
-            },
-            {
-                title: 'Action',
-                key: 'tingyong',
-                fixed: 'right' as 'right',
-                width: 80,
-                render: (text: rtyDialPerson) => {
-                    return (<div className="stop-using" data-id={text.dialPersonId}>停用</div>);
-                },
             },
             {
 
                 title: 'Action',
-                key: 'stop',
+                key: 'editor',
                 fixed: 'right' as 'right',
                 width: 80,
-                render: (text: rtyDialPerson) => {
-                    return (<div className="start-using" data-id={text.dialPersonId}>启用</div>);
+                render: (text: rtyDialPersonExtend) => {
+                    return (<div className="action" onClick={this.editor.bind(this, text)}>编辑</div>);
                 },
             }
         ],
@@ -112,7 +94,9 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
             pageSize: 5,
         },
         exeSql: false,
-        rtyDialPerson: {}
+        rtyDialPerson: {},
+        visible: false,
+        rtyDialPersonnu: {},
     }
 
     componentDidMount(): void {
@@ -176,6 +160,20 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
         })
     }
 
+    editor(rtyDialPerson: rtyDialPersonExtend) {
+        this.setState({
+            visible: true,
+            rtyDialPersonnu: rtyDialPerson,
+        })
+    }
+
+    setVisible = (visible: boolean) => {
+        this.setState({
+            visible,
+        })
+    }
+
+
     handleChange = (pagination: PaginationConfig = {current: 1, pageSize: 5}) => {
         const pager: PaginationConfig = {...this.state.pagination};
         pager.current = pagination.current;
@@ -188,7 +186,7 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
             //@ts-ignore
             firstName: rtyDialPerson.firstName,
             //@ts-ignore
-            departmentId: rtyDialPerson.department,
+            departmentId: rtyDialPerson.department && rtyDialPerson.department.id,
             size: Number(pagination.current),
             pageSize: Number(pagination.pageSize),
         }
@@ -204,7 +202,7 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
         // 填充拨入人员
         const rtyDialPersons = rtyDialPersonsByFirstCharResult ?
             rtyDialPersonsByFirstCharResult.map((item: rtyDialPerson) =>
-                <Option key={item.dialPersonId} value={item.dialPersonId}>{item.firstName}</Option>,
+                <Option key={item.dialPersonId} value={item.firstName}>{item.firstName}</Option>,
             ) : [];
 
         const departmentOptions = departmentResult ? departmentResult.map((item: { id: number, name: string }) =>
@@ -215,8 +213,9 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
                 {this.state.exeSql == false ?
                     <div>
                         <div className="nav">查询条件</div>
-                        <Row>
-                            <Form onSubmit={this.handleSubmit} style={{marginLeft: 20}}>
+                        <Form onSubmit={this.handleSubmit} style={{marginLeft: 20}}>
+                            <Row>
+
                                 <Col span={6}>
                                     <FormItem label="拨入人">
                                         {getFieldDecorator("firstName", {})(
@@ -250,19 +249,25 @@ class QueryPerson extends React.Component<queryPersonsProps, queryPersonsStates>
                                         搜索
                                     </Button>
                                 </Col>
-                            </Form>
-                        </Row>
+                            </Row>
+                        </Form>
                     </div> :
                     <div>
                         <div className="page-nick">
                             <div className="nav" onClick={this.goBack} style={{cursor: 'pointer'}}>返回</div>
                             <Table bordered
                                    columns={this.state.columns} dataSource={dataSourceResult}
-                                   pagination={this.state.pagination} scroll={{x: 2200}} loading={dataSourceLoading}
+                                   pagination={this.state.pagination} scroll={{x: 1500}} loading={dataSourceLoading}
                                    onChange={this.handleChange}/>
                         </div>
                     </div>
                 }
+                {this.state.visible &&
+                // @ts-ignore
+                <EditorFormApp visible={this.state.visible}
+                               setVisible={this.setVisible}
+                               rtyDialPerson={this.state.rtyDialPersonnu}
+                               handleTableChange={this.handleChange}/>}
             </div>
         );
     }

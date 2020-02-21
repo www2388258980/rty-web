@@ -7,7 +7,7 @@ import {FormComponentProps} from "antd/lib/form";
 import {StatusConstants} from "../../constants/commonConstants";
 import {bindActionCreators, Dispatch} from "redux";
 import {PaginationConfig} from "antd/lib/pagination";
-import {rtyDialPerson, rtyDialPersonHis, rtyDialPersonHisReq, rtyDialPersonReq} from "./data";
+import {rtyDialPerson, rtyDialPersonHis, rtyDialPersonHisExtend, rtyDialPersonHisReq, rtyDialPersonReq} from "./data";
 import {getDialPersonHis, getDialPersonByFirstChar} from './action';
 import {getAllDepartment} from "../action";
 
@@ -20,7 +20,7 @@ export interface queryPersonHisProps extends FormComponentProps {
     getAllDepartment: any;
     departmentResult: Array<{ id: number, name: string }>; // 部门
     getDialPersonHis: any;
-    rtyDialPersonsHisSourceResult: rtyDialPersonHis[];
+    rtyDialPersonsHisSourceResult: rtyDialPersonHisExtend[];
     rtyDialPersonsHisSourceLoading: boolean;
     rtyDialPersonsHisSourceTotal: number;
 }
@@ -29,7 +29,7 @@ export interface queryPersonHisStates {
     columns: any;
     pagination: PaginationConfig;
     exeSql: boolean;
-    rtyDialPersonHis: rtyDialPersonHis; // 记录查询条件
+    rtyDialPersonHis: rtyDialPersonHisExtend; // 记录查询条件
     startDate: string;
     endDate: string;
 }
@@ -39,6 +39,12 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
     state = {
         columns: [
             {
+                title: '操作类型',
+                dataIndex: 'opType',
+                width: 120,
+                fixed: 'left' as 'left',
+            },
+            {
                 title: '状态',
                 dataIndex: 'status',
                 width: 80,
@@ -46,74 +52,41 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
             {
                 title: '名字',
                 dataIndex: 'firstName',
-                width: 120,
+                width: 100,
             },
             {
                 title: '电话号码',
                 dataIndex: 'telecomNumber',
-                width: 150,
+                width: 130,
+            },
+            {
+                title: '部门',
+                dataIndex: 'department.name',
+                width: 200,
             },
             {
                 title: '描述',
                 dataIndex: 'description',
             },
             {
-                title: '部门',
-                dataIndex: 'firstName',
-                width: 200,
-            },
-            {
-                title: '创建工单',
+                title: '工单',
                 dataIndex: 'billId',
-                width: 150,
-            },
-            {
-                title: '修改工单',
-                dataIndex: 'modifiedBillId',
-                width: 150,
-            },
-            {
-                title: '创建人',
-                dataIndex: 'createdBy',
-                width: 120,
+                width: 200,
             },
             {
                 title: '修改人',
-                dataIndex: 'modifiedBy',
-                width: 120,
+                dataIndex: 'modifiedByUser.name',
+                width: 100,
             },
             {
-                title: '创建时间',
+                title: '操作时间',
                 dataIndex: 'createdStamp',
-                width: 200,
-            },
-            {
-                title: '有限期限',
-                dataIndex: 'effectiveDate',
-                width: 200,
-            },
-            {
-                title: 'Action',
-                key: 'tingyong',
+                width: 180,
                 fixed: 'right' as 'right',
-                width: 80,
-                render: (text: rtyDialPerson) => {
-                    return (<div className="stop-using" data-id={text.dialPersonId}>停用</div>);
-                },
             },
-            {
-
-                title: 'Action',
-                key: 'stop',
-                fixed: 'right' as 'right',
-                width: 80,
-                render: (text: rtyDialPerson) => {
-                    return (<div className="start-using" data-id={text.dialPersonId}>启用</div>);
-                },
-            }
         ],
         pagination: {
-            pageSize: 5,
+            pageSize: 10,
         },
         exeSql: false,
         rtyDialPersonHis: {},
@@ -161,17 +134,21 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
                 const formData = getFieldsValue();
                 const rtyDialPersonHisReq: rtyDialPersonHisReq = {
                     firstName: formData.firstName,
-                    departmentId: formData.departmentId,
+                    departmentId: formData.department,
+                    status: formData.status,
                     size: 1,
-                    pageSize: 5,
+                    pageSize: 10,
                 };
                 const {getDialPersonHis} = this.props;
-                getDialPersonHis(rtyDialPersonHisReq, formData.startDate, formData.endDate);
+                // 小于等于
+                const startDate = formData.startDate ? formData.startDate - 24 * 60 * 60 * 1000 : '';
+                getDialPersonHis(rtyDialPersonHisReq, startDate, formData.endDate);
                 this.setState({
                     exeSql: true,
                     rtyDialPersonHis: {
                         firstName: formData.firstName,
-                        departmentId: formData.departmentId,
+                        departmentId: formData.department,
+                        status: formData.status,
                     },
                     startDate: formData.startDate,
                     endDate: formData.endDate,
@@ -180,24 +157,26 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
         })
     }
 
-    handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 5}) => {
+    handleTableChange = (pagination: PaginationConfig = {current: 1, pageSize: 10}) => {
         const pager: PaginationConfig = {...this.state.pagination};
         pager.current = pagination.current;
         pager.pageSize = pagination.pageSize;
         this.setState({
             pagination: pager,
         });
-        const {rtyDialPersonHis,startDate,endDate} = this.state;
+        const {rtyDialPersonHis, startDate, endDate} = this.state;
         const rtyDialPersonHisReq: rtyDialPersonHisReq = {
             //@ts-ignore
             firstName: rtyDialPersonHis.firstName,
             //@ts-ignore
             departmentId: rtyDialPersonHis.department,
+            //@ts-ignore
+            status: formData.status,
             size: Number(pagination.current),
             pageSize: Number(pagination.pageSize),
         }
         const {getDialPersonHis} = this.props;
-        getDialPersonHis(rtyDialPersonHisReq,startDate,endDate);
+        getDialPersonHis(rtyDialPersonHisReq, startDate, endDate);
     }
 
     render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> |
@@ -212,7 +191,7 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
         // 填充拨入人员
         const rtyDialPersons = rtyDialPersonsByFirstCharResult ?
             rtyDialPersonsByFirstCharResult.map((item: rtyDialPerson) =>
-                <Option key={item.dialPersonId} value={item.dialPersonId}>{item.firstName}</Option>,
+                <Option key={item.dialPersonId} value={item.firstName}>{item.firstName}</Option>,
             ) : [];
 
         const departmentOptions = departmentResult ? departmentResult.map((item: { id: number, name: string }) =>
@@ -261,15 +240,17 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
                                     </FormItem>
                                 </Col>
                             </Row>
-                            <Row>
+                            <Row gutter={18}>
                                 <Col span={6}>
                                     <FormItem label="时间>=">
-                                        <DatePicker placeholder="选择时间"/>
+                                        {getFieldDecorator("startDate", {})(
+                                            <DatePicker placeholder="选择时间"/>)}
                                     </FormItem>
                                 </Col>
                                 <Col span={6}>
-                                    <FormItem label="时间>=">
-                                        <DatePicker placeholder="选择时间"/>
+                                    <FormItem label="时间<=">
+                                        {getFieldDecorator("endDate", {})(
+                                            <DatePicker placeholder="选择时间"/>)}
                                     </FormItem>
                                 </Col>
                                 <Col span={6} style={{paddingTop: 45, paddingLeft: 10}}>
@@ -288,7 +269,7 @@ class QueryPersonHis extends React.Component<queryPersonHisProps, queryPersonHis
                                dataSource={rtyDialPersonsHisSourceResult}
                                loading={rtyDialPersonsHisSourceLoading}
                                pagination={this.state.pagination}
-                               scroll={{x: 2200}}
+                               scroll={{x: 1600}}
                                onChange={this.handleTableChange}/>
                     </div>}
 
