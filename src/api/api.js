@@ -1,16 +1,5 @@
 import fetch from 'isomorphic-fetch';//考虑使用fetch
 
-
-const methods = [
-    'get',
-    'head',
-    'post',
-    'put',
-    'del',
-    'options',
-    'patch'
-];
-
 class _Api {
     constructor(opts) {
         this.opts = opts || {};

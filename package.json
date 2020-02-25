@@ -15,6 +15,7 @@
     "antd": "^3.26.6",
     "babel-plugin-import": "^1.13.0",
     "customize-cra": "^0.9.1",
+    "isomorphic-fetch": "^2.2.1",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
     "react": "^16.12.0",
