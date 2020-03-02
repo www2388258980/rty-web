@@ -37,6 +37,14 @@ export default function BoruReducer(state = {}, action: any) {
                     rtyDialPersonsHisSourceLoading: false,
                     rtyDialPersonsHisSourceTotal: action.payload['total'],
                 });
+            case namespace + '_deleteDialRecord_PENDING':
+                return Object.assign({}, state, {
+                    rtyDialRecordLoading: true,
+                });
+            case namespace + '_deleteDialRecord_SUCCESS':
+                return Object.assign({}, state, {
+                    rtyDialRecordLoading: false,
+                });
             default:
                 return {...state};
         }

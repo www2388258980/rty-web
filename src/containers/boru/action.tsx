@@ -106,6 +106,8 @@ export function deleteDialRecord(id: string) {
             promise: api.request(path, 'post', {id})
         },
         resultType: 'message',
+        // 优化删除之后表格还在转圈圈
+        isSpecial: true,
         namespace
     }
 }
