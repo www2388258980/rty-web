@@ -122,6 +122,10 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
                 // 小于等于
                 const startDate = formData.startDate ? formData.startDate - 24 * 60 * 60 * 1000 : '';
                 getDialRecord(rtyDialRecordReq, startDate, formData.endDate);
+                const pager: PaginationConfig = {...this.state.pagination};
+                // 修复删除之后表格转圈圈的bug;
+                pager.current = 1;
+                pager.pageSize = 10;
                 this.setState({
                     exeSql: true,
                     rtyDialRecord: {
@@ -129,7 +133,9 @@ class QueryRecord extends React.Component<QueryRecordProps, QueryRecordStates> {
                     },
                     startDate: String(startDate),
                     endDate: formData.endDate,
+                    pagination: pager,
                 })
+
             }
         }));
     }
