@@ -40,10 +40,12 @@ export default function BoruReducer(state = {}, action: any) {
             case namespace + '_deleteDialRecord_PENDING':
                 return Object.assign({}, state, {
                     rtyDialRecordLoading: true,
+                    deleteDialRecordLoading: true,
                 });
             case namespace + '_deleteDialRecord_SUCCESS':
                 return Object.assign({}, state, {
                     rtyDialRecordLoading: false,
+                    deleteDialRecordLoading: false,
                 });
             default:
                 return {...state};
